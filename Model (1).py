@@ -130,3 +130,56 @@ y_result = regressor.predict(pd.get_dummies(data, columns=['DayOfWeek', 'StateHo
 from sklearn import metrics
 print(metrics.r2_score(y, y_result))
 
+#now checking with DL
+
+import keras
+from keras.models import Sequential
+from keras.layers import Dense
+
+
+model = Sequential()
+model.add(Dense(4, input_dim = 15, activation = 'relu'))
+model.add(Dense(4, activation = 'relu'))
+model.add(Dense(1, activation = 'linear'))
+model.summary()
+
+
+
+model.compile(loss='mse', optimizer='adam', metrics=['mse','mae'])
+
+epochs_hist = model.fit(X_train, y_train, epochs = 10, batch_size = 10)
+
+epochs_hist.history.keys()
+
+plt.plot(epochs_hist.history['loss'])
+
+plt.title('Model Loss Progress During Traininig')
+plt.ylabel('Training and validation loss')
+plt.xlabel('Epoch Number')
+plt.legend(['Training Loss','Validation Loss'])
+
+
+
+predict_y = model.predict(pd.get_dummies(data, columns=['DayOfWeek', 'StateHoliday']).drop(['Sales', 'Store', 'Date'], axis=1).values)
+
+from sklearn import metrics
+print(metrics.r2_score(y, predict_y))
+
+
+#using Decision tree because better accuracy
+
+
+from sklearn import metrics
+print(metrics.r2_score(y, y_result))
+
+
+
+sample = pd.read_csv('sample_submission.csv')
+submission_df = pd.DataFrame({'Id': sample.Id, 'Sales': y_result[:41088]})
+
+submission_df.to_csv('Final_submission_file.csv', index = False)
+
+plt.figure(figsize=(20, 10))  # Set figsize to increase size of figure
+plt.plot(store_info.Sales.values[:365], label="actual value")
+plt.plot(y_predict[:365], c='r', label="predicted value")
+plt.legend()
